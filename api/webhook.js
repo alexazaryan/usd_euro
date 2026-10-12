@@ -1,5 +1,5 @@
 const ALLOWED = ["280746926", "5911578566"];
-const BUTTON = "💱 Курс сейчас блять";
+const BUTTON = "💱 Курс сейчас";
 const CACHE_MS = 10 * 60 * 1000;
 
 const CODES = ["USD", "EUR"];
