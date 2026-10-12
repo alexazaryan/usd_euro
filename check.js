@@ -235,7 +235,7 @@ async function main() {
       privat,
       [gold, silver, oil].filter(Boolean),
       crypto && crypto.main,
-      [crypto && crypto.total3, altseason, crypto && crypto.usdt, fear].filter(
+      [crypto && crypto.total3, crypto && crypto.usdt, altseason, fear].filter(
          Boolean,
       ),
    ].filter((b) => b && b.length);
