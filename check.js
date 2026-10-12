@@ -91,7 +91,21 @@ async function oilLine() {
    const x = Array.isArray(d.data) ? d.data[0] : d.data;
    const price = Number(x.price);
    if (!price) throw new Error("нет цены Brent");
-   return `🛢 <b>Нефть Brent</b>: $${price.toFixed(1)}`;
+
+   let pct = null;
+   if (x.changes && x.changes["24h"] && x.changes["24h"].percent != null) {
+      pct = Number(x.changes["24h"].percent);
+   } else if (x.change_percent != null) {
+      pct = Number(x.change_percent);
+   } else if (x.change != null) {
+      pct = (Number(x.change) / (price - Number(x.change))) * 100;
+   }
+
+   if (pct === null || Number.isNaN(pct)) {
+      console.log("Нефть: процент не найден, ответ API:", JSON.stringify(x));
+      return `🛢 <b>Нефть Brent</b>: $${price.toFixed(1)}`;
+   }
+   return `🛢 <b>Нефть Brent</b>: $${price.toFixed(1)} ${change(pct, 1)}`;
 }
 
 // ---------- Крипта ----------
