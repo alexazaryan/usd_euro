@@ -144,7 +144,7 @@ async function cryptoData() {
          tNow / (1 + (tether.market_cap_change_percentage_24h || 0) / 100);
       const domNow = (tNow / totalNow) * 100;
       const domPrev = (tPrev / totalPrev) * 100;
-      usdt = `💲 <b>USDT.D</b>: ${domNow.toFixed(1)}% ${changePP(domNow - domPrev, 1)}`;
+      usdt = `💲 <b>USDT.D</b>: ${domNow.toFixed(3)}% ${changePP(domNow - domPrev, 3)}`;
    } catch (e) {
       console.log("USDT.D не получен:", e.message);
    }
