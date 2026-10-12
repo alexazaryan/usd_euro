@@ -1,5 +1,5 @@
 const ALLOWED = ["280746926", "5911578566"];
-const BUTTON = "💱 Курс сейчас";
+const BUTTON = "💱 Курс сейчас блять";
 const CACHE_MS = 10 * 60 * 1000;
 
 const CODES = ["USD", "EUR"];
@@ -291,6 +291,10 @@ module.exports = async (req, res) => {
                   },
                });
             } else if (msg.text === BUTTON) {
+               await tg("deleteMessage", {
+                  chat_id,
+                  message_id: msg.message_id,
+               });
                await tg("sendChatAction", { chat_id, action: "typing" });
                const text = await getText();
                // нажал любой из двоих, получают оба
