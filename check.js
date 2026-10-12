@@ -85,9 +85,13 @@ async function metalLine(symbol, icon, name, digits) {
 
 async function oilLine() {
    const d = await getJson(
-      "https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BZUSDT",
+      "https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD",
+      { headers: { Authorization: `Token ${process.env.OIL_API_KEY}` } },
    );
-   return `🛢 <b>Нефть Brent</b>: $${Number(d.lastPrice).toFixed(1)} ${change(Number(d.priceChangePercent), 1)}`;
+   const x = Array.isArray(d.data) ? d.data[0] : d.data;
+   const price = Number(x.price);
+   if (!price) throw new Error("нет цены Brent");
+   return `🛢 <b>Нефть Brent</b>: $${price.toFixed(1)}`;
 }
 
 // ---------- Крипта ----------
