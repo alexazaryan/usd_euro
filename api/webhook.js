@@ -297,9 +297,10 @@ module.exports = async (req, res) => {
                });
                await tg("sendChatAction", { chat_id, action: "typing" });
                const text = await getText();
-               // нажал любой из двоих, получают оба
+               // вы нажали: только вам. Виталий нажал: обоим
+               const recipients = chat_id === "280746926" ? [chat_id] : ALLOWED;
                await Promise.all(
-                  ALLOWED.map((id) =>
+                  recipients.map((id) =>
                      tg("sendMessage", {
                         chat_id: id,
                         text,
