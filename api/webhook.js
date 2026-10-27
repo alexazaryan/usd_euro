@@ -1,5 +1,6 @@
 const ALLOWED = ["280746926", "5911578566"];
-const BUTTON = "💱 Курс сейчас";
+const OWNER = "280746926";
+const BUTTON = "Курс сейчас блять";
 const CACHE_MS = 10 * 60 * 1000;
 
 const CODES = ["USD", "EUR"];
@@ -74,7 +75,16 @@ async function privatBlock() {
 }
 
 // ---------- Золото, серебро, нефть ----------
-async function metalLine(symbol, icon, name, digits) {
+async function metalChanges() {
+   const d = await getJson(
+      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=pax-gold,kinesis-silver&price_change_percentage=24h",
+   );
+   const map = {};
+   for (const c of d) map[c.id] = c.price_change_percentage_24h;
+   return map;
+}
+
+async function metalLine(symbol, icon, name, digits, pct) {
    const d = await getJson(`https://api.gold-api.com/price/${symbol}`);
    const price = Number(d.price);
    if (!price) throw new Error(`нет цены ${symbol}`);
@@ -82,7 +92,8 @@ async function metalLine(symbol, icon, name, digits) {
       digits === 0
          ? Math.round(price).toLocaleString("en-US")
          : price.toFixed(digits);
-   return `${icon} <b>${name}</b>: $${shown}`;
+   const ch = typeof pct === "number" ? " " + change(pct, 1) : "";
+   return `${icon} <b>${name}</b>: $${shown}${ch}`;
 }
 
 async function oilLine() {
@@ -214,12 +225,18 @@ async function buildText() {
       .format(new Date(now.getTime() - 24 * 60 * 60 * 1000))
       .replaceAll("-", "");
 
+   const mch = (await safe("Изменения металлов", metalChanges)) || {};
+
    const [nbu, privat, gold, silver, oil, crypto, altseason, fear] =
       await Promise.all([
          safe("НБУ", () => nbuBlock(yesterday)),
          safe("ПриватБанк", privatBlock),
-         safe("Золото", () => metalLine("XAU", "🥇", "Золото", 0)),
-         safe("Серебро", () => metalLine("XAG", "🥈", "Серебро", 1)),
+         safe("Золото", () =>
+            metalLine("XAU", "🥇", "Золото", 0, mch["pax-gold"]),
+         ),
+         safe("Серебро", () =>
+            metalLine("XAG", "🥈", "Серебро", 1, mch["kinesis-silver"]),
+         ),
          safe("Нефть", oilLine),
          safe("Крипта", cryptoData),
          safe("Альтсезон", altseasonLine),
@@ -298,7 +315,7 @@ module.exports = async (req, res) => {
                await tg("sendChatAction", { chat_id, action: "typing" });
                const text = await getText();
                // вы нажали: только вам. Виталий нажал: обоим
-               const recipients = chat_id === "280746926" ? [chat_id] : ALLOWED;
+               const recipients = chat_id === OWNER ? [chat_id] : ALLOWED;
                await Promise.all(
                   recipients.map((id) =>
                      tg("sendMessage", {
